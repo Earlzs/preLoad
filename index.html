@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>图片之无序加载</title>
+</head>
+<style>
+    html {
+        height: 100%;
+    }
+    
+    body {
+        text-align: center;
+        margin: 150px auto;
+        height: 100%;
+    }
+    
+    .loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #eee;
+        text-align: center;
+        font-size: 33px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
+<body>
+
+    <div class="box">
+        <img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1493882947457&di=5ce72ce56aae28476fba0cf39e955081&imgtype=0&src=http%3A%2F%2Fbizhi.pcze.com%2Fzhuomian%2F1920x1200_1600x900%2F53456.jpg" alt="pic" id='img' width="1200">
+
+        <p>
+            <a href="javasrcipt:;" class="btn" data-control='perv'> 上一页</a>
+            <a href="javasrcipt:;" class="btn" data-control='next'>下一页</a>
+        </p>
+    </div>
+
+
+    <div class="loading">
+        <div class="progress"></div>
+    </div>
+</body>
+
+
+
+<script src="./jquery.js"></script>
+<script src='./preload.js'></script>
+<script>
+    var images = [
+        'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2320978584,3373640230&fm=23&gp=0.jpg',
+        'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2227729835,1144781734&fm=23&gp=0.jpg',
+        'https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=420832613,541023471&fm=23&gp=0.jpg',
+        'http://pic1.win4000.com/wallpaper/8/5879f3e1c0e62.jpg',
+        'http://pic1.win4000.com/wallpaper/8/5879f42b34968.jpg',
+        'http://pic1.win4000.com/wallpaper/5/587c3b9b67191.jpg',
+        'http://pic1.win4000.com/wallpaper/2/587f0821cc571.jpg',
+        'http://pic1.win4000.com/wallpaper/d/588083d6af28f.jpg',
+        'http://pic1.win4000.com/wallpaper/f/5881bd45b2cc1.jpg',
+        'http://pic1.win4000.com/wallpaper/8/5885d16c1c926.jpg',
+    ]
+    var index = 0; //当前是第几张图片
+    var leg = images.length; //有几张图片
+    var count = 0; //记录当前的count数量
+    var $progress = $('.progress');
+
+
+
+    $.preload(images, {
+        //each每加载一张图片执行的函数
+        each: function() {
+            $progress.html(Math.round((count + 1) / leg * 100) + '%');
+            count++;
+        },
+        //all所有图片加载完后执行的函数
+        all: function() {
+            $('.loading').hide();
+            document.title = '1/' + leg;
+        }
+    })
+
+
+
+    //未封装成jq插件时候的逻辑
+    // $.each(images, function(i, src) {
+    //     var imgObj = new Image();
+    //     $(imgObj).on('load error', function() {
+    //         $progress.html(Math.round((count + 1) / leg * 100) + '%');
+    //         if (count >= leg - 1) {
+    //             $('.loading').hide();
+    //             document.title = '1/' + leg;
+    //         }
+    //         count++;
+    //     })
+    //     imgObj.src = src;
+    // })
+
+    $('.btn').on('click', function() {
+        if ($(this).data('control') === 'perv') {
+
+            index = Math.max(0, --index);
+        } else {
+            index = Math.min(leg - 1, ++index);
+        }
+        document.title = (index + 1) + '/' + leg;
+        $('#img').attr('src', images[index]);
+    });
+</script>
+
+</html>
